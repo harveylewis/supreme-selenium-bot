@@ -8,9 +8,11 @@ from bs4 import BeautifulSoup
 from ConfigParser import SafeConfigParser
 
 
+
 parser = SafeConfigParser()
 parser.read('Config.cfg')
 targetItemCategoryUrl = parser.get('user', 'targetItemCategoryUrl')
+keywords = parser.get('user', 'keywords')
 
 
 #gets all HTML info from targetItemCategoryUrl
@@ -29,8 +31,8 @@ def extractLinks(list):
 	linksList1 = []
 	for href in list:
 	    linksList1.append(href.get('href'))
-
 	print ("Extracted Links from HTML")
+	linksList1 = [x.encode('ascii') for x in linksList1]
 	return linksList1
 
 
@@ -48,19 +50,21 @@ def followPageLinks(links):
 		nameOfProduct = (itemName[0].text)
 		colourOfProduct = (itemColour[0].text)
 		dictionary[nameOfProduct + ' ' + colourOfProduct] = [url]
+	list1 = [x.encode('ascii') for x in list1]
 	print ("Created dictionary to lookup your item")
 	return dictionary, list1
 
 
 def findBestMatched():
 	d = {}
-	keywords = ['Broken', 'Paisley', 'Red']
+	# keywords = ['Broken', 'Paisley', 'Red']
 	for name in itemNameList:
 	    d[name] = 0
 	    for kw in keywords:
 	        if kw in name:
 	            d[name] += 1
 	item = max(d, key=d.get)
+	print ("Finding Best matched item using keywords")
 	return item
 
 
@@ -72,13 +76,14 @@ def findBestMatched():
 
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
+# print itemLinks
 itemDict, itemNameList = followPageLinks(itemLinks)
-# print itemDict.get('Broken Paisley Flannel Zip Up Shirt Navy')
-# print itemDict
 # print itemNameList
-
 bestMatch = findBestMatched()
-print bestMatch
+print ('Found best matched item: ' + bestMatch)
+bestMatchedLink = itemDict.get(bestMatch)
+print bestMatchedLink
+
 
 
 
@@ -117,8 +122,7 @@ print bestMatch
 
 """
 TODO
-add comments
-improve config
-clean up
+Sort out dictionary 
+Function for finding best matched link
 
 """
