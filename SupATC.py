@@ -37,20 +37,31 @@ def extractLinks(list):
 #Follows href values (links) and parses data, then adds items to dictionary
 def followPageLinks(links):
 	dictionary = {}
+	list1= []
 	for url in links:
 		# print ('http://www.supremenewyork.com' + url)
 		pageRequest2 = requests.get('http://www.supremenewyork.com' + url)
 		soup2 = BeautifulSoup(pageRequest2.content, "html.parser")
 		itemName = soup2.find_all(itemprop="name")
 		itemColour = soup2.find_all(class_="style")
+		list1.append(itemName[0].text + ' ' + itemColour[0].text)
 		nameOfProduct = (itemName[0].text)
 		colourOfProduct = (itemColour[0].text)
-		dictionary[url] = [nameOfProduct, colourOfProduct]
+		dictionary[nameOfProduct + ' ' + colourOfProduct] = [url]
 	print ("Created dictionary to lookup your item")
-	return dictionary
+	return dictionary, list1
 
 
-#Best matched link function
+def findBestMatched():
+	d = {}
+	keywords = ['Broken', 'Paisley', 'Red']
+	for name in itemNameList:
+	    d[name] = 0
+	    for kw in keywords:
+	        if kw in name:
+	            d[name] += 1
+	item = max(d, key=d.get)
+	return item
 
 
 
@@ -61,14 +72,13 @@ def followPageLinks(links):
 
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
-itemDict = followPageLinks(itemLinks)
+itemDict, itemNameList = followPageLinks(itemLinks)
+# print itemDict.get('Broken Paisley Flannel Zip Up Shirt Navy')
 # print itemDict
+# print itemNameList
 
-# targetProduct = ("u'Printed Stripe Shirt', u'Red'")
-# for url, nameOfProduct in itemDict.items():
-#     if nameOfProduct == targetProduct:
-#         print url
-
+bestMatch = findBestMatched()
+print bestMatch
 
 
 
@@ -107,7 +117,8 @@ itemDict = followPageLinks(itemLinks)
 
 """
 TODO
-Sort out dictionary 
-Function for finding best matched link
+add comments
+improve config
+clean up
 
 """
