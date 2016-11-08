@@ -8,31 +8,36 @@ import requests
 from bs4 import BeautifulSoup
 
 
+targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/shirts')
+
+
 
 #Collect links from 'new' page
 pageRequest = requests.get('http://www.supremenewyork.com/shop/all/shirts')
 soup = BeautifulSoup(pageRequest.content, "html.parser")
 links = soup.select("div.turbolink_scroller a")
 
-allProductInfo = soup.find_all("a", class_="name-link")
-# print allProductInfo
-
-hrefLinks = []
+# Gets all divs with class of inner-article then search for a with name-link class that is inside an h1 tag
+allProductInfo = soup.select("div.inner-article h1 a.name-link")
+# print (allProductInfo)
+linksList1 = []
 for href in allProductInfo:
-    hrefLinks.append(href.get('href'))
+    linksList1.append(href.get('href'))
 
-itemLinks = set(hrefLinks)
-print itemLinks
+
 
 #Follow links and parse info
-for url in itemLinks:
-	print ('http://www.supremenewyork.com' + url)
+for url in linksList1:
+	# print ('http://www.supremenewyork.com' + url)
 	pageRequest2 = requests.get('http://www.supremenewyork.com' + url)
 	soup2 = BeautifulSoup(pageRequest2.content, "html.parser")
 	itemName = soup2.find_all(itemprop="name")
-	print(itemName)
 	itemColour = soup2.find_all(class_="style")
-	print(itemColour)
+	# print(itemName[0].text)
+	# print(itemColour[0].text)
+	linkDict = {}
+	linkDict[url] = [itemName[0].text, itemColour[0].text]
+	print linkDict
 
 
 
@@ -40,11 +45,6 @@ for url in itemLinks:
 
 
 
-
-#hrefLinks = []
-#for link in 
-#hrefLinks.append([productInfo])
-#print hrefLinks
-
+## TODO
 #refresh until new links are added
 #open the new links page
