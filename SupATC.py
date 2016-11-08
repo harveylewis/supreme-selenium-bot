@@ -1,16 +1,6 @@
 """
-╭━━━┳╮╱╭┳━━━┳━━━┳━━━┳━╮╭━┳━━━╮
-┃╭━╮┃┃╱┃┃╭━╮┃╭━╮┃╭━━┫┃╰╯┃┃╭━━╯
-┃╰━━┫┃╱┃┃╰━╯┃╰━╯┃╰━━┫╭╮╭╮┃╰━━╮
-╰━━╮┃┃╱┃┃╭━━┫╭╮╭┫╭━━┫┃┃┃┃┃╭━━╯
-┃╰━╯┃╰━╯┃┃╱╱┃┃┃╰┫╰━━┫┃┃┃┃┃╰━━╮
-╰━━━┻━━━┻╯╱╱╰╯╰━┻━━━┻╯╰╯╰┻━━━╯
-╭━━━┳━━━━┳━━━╮
-┃╭━╮┃╭╮╭╮┃╭━╮┃
-┃┃╱┃┣╯┃┃╰┫┃╱╰╯
-┃╰━╯┃╱┃┃╱┃┃╱╭╮
-┃╭━╮┃╱┃┃╱┃╰━╯┃
-╰╯╱╰╯╱╰╯╱╰━━━╯
+Supreme ATC script
+
 """
 
 import requests
@@ -26,35 +16,60 @@ def getLinks():
 	soup = BeautifulSoup(pageRequest.content, "html.parser")
 	links = soup.select("div.turbolink_scroller a")
 	# Gets all divs with class of inner-article then search for a with name-link class that is inside an h1 tag
-	global allProductInfo
-	allProductInfo = soup.select("div.inner-article h1 a.name-link")
-	return allProductInfo
+	pageOfHtml = soup.select("div.inner-article h1 a.name-link")
+	return pageOfHtml
 
-def addToList():
-	global linksList1
+
+
+def extractLinks(list):
 	linksList1 = []
-	for href in allProductInfo:
+	for href in list:
 	    linksList1.append(href.get('href'))
 	return linksList1
 
 
-def findProductDetails():
-	#Follow links and parse info
-	for url in linksList1:
+
+#Follow links and parse data
+def followPageLinks(links):
+	dictionary = {}
+	for url in links:
 		# print ('http://www.supremenewyork.com' + url)
 		pageRequest2 = requests.get('http://www.supremenewyork.com' + url)
 		soup2 = BeautifulSoup(pageRequest2.content, "html.parser")
 		itemName = soup2.find_all(itemprop="name")
 		itemColour = soup2.find_all(class_="style")
-		print(itemName[0].text)
-		print(itemColour[0].text)
-		global linkDict
-		linkDict = {}
-		linkDict[url] = [itemName[0].text, itemColour[0].text]
-		return linkDict
+		# print(itemName[0].text)
+		# print(itemColour[0].text)
+		dictionary[url] = [itemName[0].text, itemColour[0].text]
+	return dictionary
 
 
 
+#################
+#Main Code
+#################
+
+allProductInfo = getLinks()
+itemLinks = extractLinks(allProductInfo)
+itemDict = followPageLinks(itemLinks)
+print itemDict
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#jncaiucb
 # while True:
 #     time.sleep(3) #Waits 5 minutes between requests
 # 	pageRequest = requests.get('http://www.supremenewyork.com/shop/all/shirts')
@@ -72,11 +87,6 @@ def findProductDetails():
 #             print item #Or do whatever you do to match keywords to links and break to continue
 #         break
 # #DoMoreStuff
-
-# getLinks()
-# addToList()
-# findProductDetails()
-# print linkDict
 
 
 #TODO
