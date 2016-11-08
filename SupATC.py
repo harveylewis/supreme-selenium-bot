@@ -5,31 +5,36 @@ Supreme ATC script
 
 import requests
 from bs4 import BeautifulSoup
+from ConfigParser import SafeConfigParser
 
 
-targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/shirts')
+parser = SafeConfigParser()
+parser.read('Config.cfg')
+targetItemCategoryUrl = parser.get('user', 'targetItemCategoryUrl')
 
 
+#gets all HTML info from targetItemCategoryUrl
 def getLinks():
 	#Collect links from 'new' page
-	pageRequest = requests.get('http://www.supremenewyork.com/shop/all/shirts')
+	pageRequest = requests.get(targetItemCategoryUrl)
 	soup = BeautifulSoup(pageRequest.content, "html.parser")
 	links = soup.select("div.turbolink_scroller a")
 	# Gets all divs with class of inner-article then search for a with name-link class that is inside an h1 tag
 	pageOfHtml = soup.select("div.inner-article h1 a.name-link")
+	print ("saved HTML")
 	return pageOfHtml
 
-
-
+#Extracts the href values (URLS) from the HTML
 def extractLinks(list):
 	linksList1 = []
 	for href in list:
 	    linksList1.append(href.get('href'))
+
+	print ("Extracted Links from HTML")
 	return linksList1
 
 
-
-#Follow links and parse data
+#Follows href values (links) and parses data, then adds items to dictionary
 def followPageLinks(links):
 	dictionary = {}
 	for url in links:
@@ -38,10 +43,15 @@ def followPageLinks(links):
 		soup2 = BeautifulSoup(pageRequest2.content, "html.parser")
 		itemName = soup2.find_all(itemprop="name")
 		itemColour = soup2.find_all(class_="style")
-		# print(itemName[0].text)
-		# print(itemColour[0].text)
-		dictionary[url] = [itemName[0].text, itemColour[0].text]
+		nameOfProduct = (itemName[0].text)
+		colourOfProduct = (itemColour[0].text)
+		dictionary[url] = [nameOfProduct, colourOfProduct]
+	print ("Created dictionary to lookup your item")
 	return dictionary
+
+
+#Best matched link function
+
 
 
 
@@ -52,7 +62,14 @@ def followPageLinks(links):
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
 itemDict = followPageLinks(itemLinks)
-print itemDict
+# print itemDict
+
+# targetProduct = ("u'Printed Stripe Shirt', u'Red'")
+# for url, nameOfProduct in itemDict.items():
+#     if nameOfProduct == targetProduct:
+#         print url
+
+
 
 
 
@@ -88,7 +105,9 @@ print itemDict
 #         break
 # #DoMoreStuff
 
+"""
+TODO
+Sort out dictionary 
+Function for finding best matched link
 
-#TODO
-# sort out functions
-# 
+"""
