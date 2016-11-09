@@ -12,7 +12,7 @@ from ConfigParser import SafeConfigParser
 parser = SafeConfigParser()
 parser.read('Config.cfg')
 targetItemCategoryUrl = parser.get('user', 'targetItemCategoryUrl')
-keywords = parser.get('user', 'keywords')
+keywords = ['Araki', 'Rose','Tee', 'Black']
 
 
 #gets all HTML info from targetItemCategoryUrl
@@ -55,20 +55,28 @@ def followPageLinks(links):
 	return dictionary, list1
 
 
+# def findBestMatched():
+# 	d = {}
+# 	# keywords = ['Broken', 'Paisley', 'Red']
+# 	for name in itemNameList:
+# 	    d[name] = 0
+# 	    for kw in keywords:
+# 	        if kw in name:
+# 	            d[name] += 1
+# 	item = max(d, key=d.get)
+# 	print ("Finding Best matched item using keywords")
+# 	return item
+
 def findBestMatched():
-	d = {}
-	# keywords = ['Broken', 'Paisley', 'Red']
-	for name in itemNameList:
-	    d[name] = 0
-	    for kw in keywords:
-	        if kw in name:
-	            d[name] += 1
-	item = max(d, key=d.get)
-	print ("Finding Best matched item using keywords")
-	return item
-
-
-
+	MatchDic={}
+	for i in itemNameList:
+	    matches=0
+	    for item in keywords:
+	        if item in i:
+	            matches=matches+1
+	    MatchDic[i]=matches
+	# print MatchDic
+	return max(MatchDic, key=MatchDic.get)
 
 #################
 #Main Code
@@ -76,12 +84,13 @@ def findBestMatched():
 
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
-# print itemLinks
 itemDict, itemNameList = followPageLinks(itemLinks)
-# print itemNameList
+print ('Searching dictionary for best match')
 bestMatch = findBestMatched()
-print ('Found best matched item: ' + bestMatch)
+# print ('Found best matched item: ' + bestMatch)
 bestMatchedLink = itemDict.get(bestMatch)
+print ' '
+print ('The best matched link is: ')
 print bestMatchedLink
 
 
@@ -122,7 +131,7 @@ print bestMatchedLink
 
 """
 TODO
-Sort out dictionary 
-Function for finding best matched link
+
+Find new links function
 
 """
