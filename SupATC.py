@@ -7,7 +7,8 @@ import requests
 from bs4 import BeautifulSoup
 from ConfigParser import SafeConfigParser
 from termcolor import colored, cprint
-
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 
 parser = SafeConfigParser()
@@ -42,7 +43,6 @@ def followPageLinks(links):
 	dictionary = {}
 	list1= []
 	for url in links:
-		# print ('http://www.supremenewyork.com' + url)
 		pageRequest2 = requests.get('http://www.supremenewyork.com' + url)
 		soup2 = BeautifulSoup(pageRequest2.content, "html.parser")
 		itemName = soup2.find_all(itemprop="name")
@@ -50,23 +50,11 @@ def followPageLinks(links):
 		list1.append(itemName[0].text + ' ' + itemColour[0].text)
 		nameOfProduct = (itemName[0].text)
 		colourOfProduct = (itemColour[0].text)
-		dictionary[nameOfProduct + ' ' + colourOfProduct] = [url]
+		dictionary[nameOfProduct + ' ' + colourOfProduct] = url
 	list1 = [x.encode('ascii') for x in list1]
 	print colored("Created dictionary to lookup your item", 'green')
 	return dictionary, list1
 
-
-# def findBestMatched():
-# 	d = {}
-# 	# keywords = ['Broken', 'Paisley', 'Red']
-# 	for name in itemNameList:
-# 	    d[name] = 0
-# 	    for kw in keywords:
-# 	        if kw in name:
-# 	            d[name] += 1
-# 	item = max(d, key=d.get)
-# 	print ("Finding Best matched item using keywords")
-# 	return item
 
 def findBestMatched():
 	MatchDic={}
@@ -87,7 +75,7 @@ itemLinks = extractLinks(allProductInfo)
 itemDict, itemNameList = followPageLinks(itemLinks)
 print colored('Searching dictionary for best match','green')
 bestMatch = findBestMatched()
-# print ('Found best matched item: ' + bestMatch)
+print ('Found best matched item: ' + bestMatch)
 bestMatchedLink = itemDict.get(bestMatch)
 print ' '
 print colored('The best matched link is: ', 'magenta')
