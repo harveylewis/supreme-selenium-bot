@@ -6,6 +6,7 @@ Supreme ATC script
 import requests
 from bs4 import BeautifulSoup
 from ConfigParser import SafeConfigParser
+from termcolor import colored, cprint
 
 
 
@@ -23,7 +24,7 @@ def getLinks():
 	links = soup.select("div.turbolink_scroller a")
 	# Gets all divs with class of inner-article then search for a with name-link class that is inside an h1 tag
 	pageOfHtml = soup.select("div.inner-article h1 a.name-link")
-	print ("saved HTML")
+	print colored("saved HTML", 'green')
 	return pageOfHtml
 
 #Extracts the href values (URLS) from the HTML
@@ -31,7 +32,7 @@ def extractLinks(list):
 	linksList1 = []
 	for href in list:
 	    linksList1.append(href.get('href'))
-	print ("Extracted Links from HTML")
+	print colored("Extracted Links from HTML", 'green')
 	linksList1 = [x.encode('ascii') for x in linksList1]
 	return linksList1
 
@@ -51,7 +52,7 @@ def followPageLinks(links):
 		colourOfProduct = (itemColour[0].text)
 		dictionary[nameOfProduct + ' ' + colourOfProduct] = [url]
 	list1 = [x.encode('ascii') for x in list1]
-	print ("Created dictionary to lookup your item")
+	print colored("Created dictionary to lookup your item", 'green')
 	return dictionary, list1
 
 
@@ -75,7 +76,6 @@ def findBestMatched():
 	        if item in i:
 	            matches=matches+1
 	    MatchDic[i]=matches
-	# print MatchDic
 	return max(MatchDic, key=MatchDic.get)
 
 #################
@@ -85,12 +85,12 @@ def findBestMatched():
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
 itemDict, itemNameList = followPageLinks(itemLinks)
-print ('Searching dictionary for best match')
+print colored('Searching dictionary for best match','green')
 bestMatch = findBestMatched()
 # print ('Found best matched item: ' + bestMatch)
 bestMatchedLink = itemDict.get(bestMatch)
 print ' '
-print ('The best matched link is: ')
+print colored('The best matched link is: ', 'magenta')
 print bestMatchedLink
 
 
