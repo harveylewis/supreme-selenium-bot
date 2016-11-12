@@ -7,14 +7,17 @@ import requests
 from bs4 import BeautifulSoup
 from ConfigParser import SafeConfigParser
 from termcolor import colored, cprint
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+import time
+from time import sleep
+
+def GMT():
+    return (time.strftime("%H:%M:%S"))
 
 
 parser = SafeConfigParser()
 parser.read('Config.cfg')
-targetItemCategoryUrl = parser.get('user', 'targetItemCategoryUrl')
-keywords = ['Araki', 'Rose','Tee', 'Black']
+targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/shirts')
+keywords = ['Printed', 'Stripe', 'Navy']
 
 
 #gets all HTML info from targetItemCategoryUrl
@@ -25,7 +28,7 @@ def getLinks():
 	links = soup.select("div.turbolink_scroller a")
 	# Gets all divs with class of inner-article then search for a with name-link class that is inside an h1 tag
 	pageOfHtml = soup.select("div.inner-article h1 a.name-link")
-	print colored("saved HTML", 'green')
+	print (GMT() +  " :: saved HTML from target page")
 	return pageOfHtml
 
 #Extracts the href values (URLS) from the HTML
@@ -33,7 +36,7 @@ def extractLinks(list):
 	linksList1 = []
 	for href in list:
 	    linksList1.append(href.get('href'))
-	print colored("Extracted Links from HTML", 'green')
+	print (GMT() + " :: Extracted Links from the HTML")
 	linksList1 = [x.encode('ascii') for x in linksList1]
 	return linksList1
 
@@ -52,18 +55,18 @@ def followPageLinks(links):
 		colourOfProduct = (itemColour[0].text)
 		dictionary[nameOfProduct + ' ' + colourOfProduct] = url
 	list1 = [x.encode('ascii') for x in list1]
-	print colored("Created dictionary to lookup your item", 'green')
+	print (GMT() + " :: Created a dictionary to lookup your target item")
 	return dictionary, list1
 
 
 def findBestMatched():
 	MatchDic={}
-	for i in itemNameList:
+	for name in itemNameList:
 	    matches=0
 	    for item in keywords:
-	        if item in i:
+	        if item in name:
 	            matches=matches+1
-	    MatchDic[i]=matches
+	    MatchDic[name]=matches
 	return max(MatchDic, key=MatchDic.get)
 
 #################
@@ -73,15 +76,17 @@ def findBestMatched():
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
 itemDict, itemNameList = followPageLinks(itemLinks)
-print colored('Searching dictionary for best match','green')
+sleep(0.3)
+print (GMT() + ' :: Searching dictionary for best match')
 bestMatch = findBestMatched()
-print ('Found best matched item: ' + bestMatch)
-bestMatchedLink = itemDict.get(bestMatch)
+sleep(0.3)
 print ' '
-print colored('The best matched link is: ', 'magenta')
+print (GMT() + ' :: The best matched item is: ' + bestMatch)
+sleep(0.3)
+bestMatchedLink = itemDict.get(bestMatch)
+print (GMT() + ' :: The link is for the item is: ')
+sleep(0.3)
 print bestMatchedLink
-
-
 
 
 
@@ -100,7 +105,7 @@ print bestMatchedLink
 
 #jncaiucb
 # while True:
-#     time.sleep(3) #Waits 5 minutes between requests
+#     time.sleep(3) #sleeps 5 minutes between requests
 # 	pageRequest = requests.get('http://www.supremenewyork.com/shop/all/shirts')
 # 	soup = BeautifulSoup(pageRequest.content, "html.parser")
 # 	links = soup.select("div.turbolink_scroller a")
