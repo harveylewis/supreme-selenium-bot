@@ -9,6 +9,9 @@ from ConfigParser import SafeConfigParser
 from termcolor import colored, cprint
 import time
 from time import sleep
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+
 
 def GMT():
     return (time.strftime("%H:%M:%S"))
@@ -17,7 +20,7 @@ def GMT():
 parser = SafeConfigParser()
 parser.read('Config.cfg')
 targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/shirts')
-keywords = ['Printed', 'Stripe', 'Navy']
+keywords = ['Black', 'Plaid', 'Multi']
 
 
 #gets all HTML info from targetItemCategoryUrl
@@ -69,9 +72,74 @@ def findBestMatched():
 	    MatchDic[name]=matches
 	return max(MatchDic, key=MatchDic.get)
 
+def driveTheWeb(link):
+	driver.get(link)
+
+	sizeDropDown = Select(driver.find_element_by_id('size'))
+	sizeDropDown.select_by_visible_text('Large')
+	sleep(0.5)
+
+	addToBasketButton = driver.find_element_by_name("commit")
+	addToBasketButton.click()
+	sleep(0.6)
+
+	checkoutButton = driver.find_element_by_xpath('/html/body/div[2]/div/div[1]/div/a[2]')
+	checkoutButton.click()
+	sleep(0.5)
+
+	fullNameEntry = driver.find_element_by_id('order_billing_name')
+	fullNameEntry.send_keys('Harvey Lewis')
+
+	emailEntry = driver.find_element_by_id('order_email')
+	emailEntry.send_keys('harvey.l@hotmail.co.uk')
+
+	telNumberEntry = driver.find_element_by_id('order_tel')
+	telNumberEntry.send_keys('07931248105')
+
+	addressLineOneEntry = driver.find_element_by_id('bo')
+	addressLineOneEntry.send_keys('37A West town lane')
+
+	addressLineTwoEntry = driver.find_element_by_id('oba3')
+	addressLineTwoEntry.send_keys('Brislington')
+
+	cityEntry = driver.find_element_by_id('order_billing_city')
+	cityEntry.send_keys('Bristol')
+
+	postcodeEntry = driver.find_element_by_id('order_billing_zip')
+	postcodeEntry.send_keys('BS4 5DD')
+
+	CCtypeDropDown = Select(driver.find_element_by_id('credit_card_type'))
+	CCtypeDropDown.select_by_visible_text('Visa')
+
+	CCnumberEntry = driver.find_element_by_id('cnb')
+	CCnumberEntry.send_keys('1234 5678 1234 1234')
+
+	CCexpiryMonth = Select(driver.find_element_by_id('credit_card_month'))
+	CCexpiryMonth.select_by_visible_text('01')
+
+	CCexpiryYear = Select(driver.find_element_by_id('credit_card_year'))
+	CCexpiryYear.select_by_visible_text('2018')
+
+	CCsecurityNumberEntry = driver.find_element_by_id('vval')
+	CCsecurityNumberEntry.send_keys('123')
+
+	termsCheckbox = driver.find_element_by_id('order_terms')
+	termsCheckbox.click()
+
+	completeOrderButton = driver.find_element_by_xpath('/html/body/div[2]/div[1]/form/div[4]/div/input')
+	completeOrderButton.click()
+
+	print GMT() + ' :: You checked out BOI'
+
+
+
+
 #################
 #Main Code
 #################
+
+print (GMT() + ' :: Opening Browser BOI')
+driver = webdriver.Firefox()
 
 allProductInfo = getLinks()
 itemLinks = extractLinks(allProductInfo)
@@ -86,7 +154,13 @@ sleep(0.3)
 bestMatchedLink = itemDict.get(bestMatch)
 print (GMT() + ' :: The link is for the item is: ')
 sleep(0.3)
-print bestMatchedLink
+targetItemLink = 'https://www.supremenewyork.com' + bestMatchedLink
+print targetItemLink
+sleep(0.3)
+print GMT() + ' :: Loading browser'
+driveTheWeb(targetItemLink)
+
+
 
 
 
