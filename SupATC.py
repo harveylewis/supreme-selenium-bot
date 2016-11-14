@@ -31,7 +31,6 @@ def getLinks():
 	links = soup.select("div.turbolink_scroller a")
 	# Gets all divs with class of inner-article then search for a with name-link class that is inside an h1 tag
 	pageOfHtml = soup.select("div.inner-article h1 a.name-link")
-	print (GMT() +  " :: saved HTML from target page")
 	return pageOfHtml
 
 #Extracts the href values (URLS) from the HTML
@@ -39,10 +38,8 @@ def extractLinks(list):
 	linksList1 = []
 	for href in list:
 	    linksList1.append(href.get('href'))
-	print (GMT() + " :: Extracted Links from the HTML")
 	linksList1 = [x.encode('ascii') for x in linksList1]
 	return linksList1
-
 
 #Follows href values (links) and parses data, then adds items to dictionary
 def followPageLinks(links):
@@ -58,13 +55,12 @@ def followPageLinks(links):
 		colourOfProduct = (itemColour[0].text)
 		dictionary[nameOfProduct + ' ' + colourOfProduct] = url
 	list1 = [x.encode('ascii') for x in list1]
-	print (GMT() + " :: Created a dictionary to lookup your target item")
 	return dictionary, list1
 
-
-def findBestMatched():
+#creates a dictionary to search for best matched item
+def findBestMatched(listOfItemNames):
 	MatchDic={}
-	for name in itemNameList:
+	for name in listOfItemNames:
 	    matches=0
 	    for item in keywords:
 	        if item in name:
@@ -72,6 +68,7 @@ def findBestMatched():
 	    MatchDic[name]=matches
 	return max(MatchDic, key=MatchDic.get)
 
+#Uses webdriver to add to basket and checkout
 def driveTheWeb(link):
 	driver.get(link)
 
@@ -140,65 +137,49 @@ def driveTheWeb(link):
 
 print (GMT() + ' :: Opening Browser BOI')
 driver = webdriver.Firefox()
+driver.get(targetItemCategoryUrl)
 
+print GMT() + ' :: Your keywords are : ' + ', '.join(keywords)
 allProductInfo = getLinks()
-itemLinks = extractLinks(allProductInfo)
-itemDict, itemNameList = followPageLinks(itemLinks)
-sleep(0.3)
+print (GMT() +  " :: saved HTML from target page")
+sleep(0.2)
+
+print GMT() + ' :: Extracted Links from the HTML'
+linksList1 = extractLinks(allProductInfo)
+sleep(0.2)
+
+print GMT() + ' :: Starting to try for new links'
+while True:
+	time.sleep(2) #Waits 2 seconds between requests
+	newHtml = getLinks()
+	linksList2 = extractLinks(newHtml)
+	print GMT() + ' :: Tried for new links'
+
+	if linksList1 != linksList2:
+		newLinks = linksList2 - linksList1
+		print GMT() + " :: New links found BOI"
+		break
+
+
+print (GMT() + ' :: Created a dictionary to lookup your target item')
+itemDict, itemNameList = followPageLinks(linksList1)
+sleep(0.2)
+
 print (GMT() + ' :: Searching dictionary for best match')
-bestMatch = findBestMatched()
-sleep(0.3)
+bestMatch = findBestMatched(itemNameList)
+sleep(0.2)
+
 print ' '
 print (GMT() + ' :: The best matched item is: ' + bestMatch)
-sleep(0.3)
+sleep(0.2)
+
 bestMatchedLink = itemDict.get(bestMatch)
 print (GMT() + ' :: The link is for the item is: ')
-sleep(0.3)
+sleep(0.2)
+
 targetItemLink = 'https://www.supremenewyork.com' + bestMatchedLink
 print targetItemLink
-sleep(0.3)
+sleep(0.2)
+
 print GMT() + ' :: Loading browser'
-driveTheWeb(targetItemLink)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#jncaiucb
-# while True:
-#     time.sleep(3) #sleeps 5 minutes between requests
-# 	pageRequest = requests.get('http://www.supremenewyork.com/shop/all/shirts')
-# 	soup = BeautifulSoup(pageRequest.content, "html.parser")
-# 	links = soup.select("div.turbolink_scroller a")
-# 	allProductInfo = soup.select("div.inner-article h1 a.name-link")
-# 	linksList2 = []
-# 	for href in allProductInfo:
-# 	    linksList2.append(href.get('href'))
-
-#     if set(Links1) != set(Links2):
-#         NewLinks = set(Links2) - set(Links1)
-#         print("New links since first request:")
-#         for item in NewLinks:
-#             print item #Or do whatever you do to match keywords to links and break to continue
-#         break
-# #DoMoreStuff
-
-"""
-TODO
-
-Find new links function
-
-"""
+# driveTheWeb(targetItemLink)
