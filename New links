@@ -1,0 +1,26 @@
+while True:
+     time.sleep(3) #Waits 5 minutes between requests
+        newHtml = getLinks()
+        linksList2 = extractLinks(newHtml)
+
+     if linksList1 != linksList2:
+         NewLinks = linksList2 - linksList1
+         print("New links found BOI")
+         targetItemsLink = findBestMatched(NewLinks)
+         break
+    #DoMoreStuff
+    
+    
+    
+
+
+
+def findBestMatched(listOfLinks):
+	MatchDic={}
+	for i in listOfLinks:
+	    matches=0
+	    for item in keywords:
+	        if item in i:
+	            matches=matches+1
+	    MatchDic[i]=matches
+	return max(MatchDic, key=MatchDic.get)
