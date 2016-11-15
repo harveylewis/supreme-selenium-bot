@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 """
 Supreme ATC script
 
@@ -11,6 +13,7 @@ import time
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
+import pause
 
 
 def GMT():
@@ -129,57 +132,60 @@ def driveTheWeb(link):
 	print GMT() + ' :: You checked out BOI'
 
 
+def main():
+
+	print (GMT() + ' :: Opening Browser BOI')
+	driver = webdriver.Firefox()
+	driver.get(targetItemCategoryUrl)
+
+	print GMT() + ' :: Your keywords are : ' + ', '.join(keywords)
+	allProductInfo = getLinks()
+	print (GMT() +  " :: saved HTML from target page")
+	sleep(0.2)
+
+	print GMT() + ' :: Extracted Links from the HTML'
+	linksList1 = extractLinks(allProductInfo)
+	sleep(0.2)
+
+	print GMT() + ' :: Starting to try for new links'
+	while True:
+		time.sleep(2) #Waits 2 seconds between requests
+		newHtml = getLinks()
+		linksList2 = extractLinks(newHtml)
+		print GMT() + ' :: Tried for new links'
+
+		if linksList1 != linksList2:
+			newLinks = linksList2 - linksList1
+			print GMT() + " :: New links found BOI"
+			break
 
 
-#################
-#Main Code
-#################
+	# print (GMT() + ' :: Created a dictionary to lookup your target item')
+	itemDict, itemNameList = followPageLinks(linksList1)
+	sleep(0.2)
 
-print (GMT() + ' :: Opening Browser BOI')
-driver = webdriver.Firefox()
-driver.get(targetItemCategoryUrl)
+	print (GMT() + ' :: Searching dictionary for best match')
+	bestMatch = findBestMatched(itemNameList)
+	sleep(0.2)
 
-print GMT() + ' :: Your keywords are : ' + ', '.join(keywords)
-allProductInfo = getLinks()
-print (GMT() +  " :: saved HTML from target page")
-sleep(0.2)
+	print ' '
+	print (GMT() + ' :: The best matched item is: ' + bestMatch)
+	sleep(0.2)
 
-print GMT() + ' :: Extracted Links from the HTML'
-linksList1 = extractLinks(allProductInfo)
-sleep(0.2)
+	bestMatchedLink = itemDict.get(bestMatch)
+	print (GMT() + ' :: The link is for the item is: ')
+	sleep(0.2)
 
-print GMT() + ' :: Starting to try for new links'
-while True:
-	time.sleep(2) #Waits 2 seconds between requests
-	newHtml = getLinks()
-	linksList2 = extractLinks(newHtml)
-	print GMT() + ' :: Tried for new links'
+	targetItemLink = 'https://www.supremenewyork.com' + bestMatchedLink
+	print targetItemLink
+	sleep(0.2)
 
-	if linksList1 != linksList2:
-		newLinks = linksList2 - linksList1
-		print GMT() + " :: New links found BOI"
-		break
+	print GMT() + ' :: Loading browser'
+	driveTheWeb(targetItemLink)
 
 
-print (GMT() + ' :: Created a dictionary to lookup your target item')
-itemDict, itemNameList = followPageLinks(linksList1)
-sleep(0.2)
-
-print (GMT() + ' :: Searching dictionary for best match')
-bestMatch = findBestMatched(itemNameList)
-sleep(0.2)
-
-print ' '
-print (GMT() + ' :: The best matched item is: ' + bestMatch)
-sleep(0.2)
-
-bestMatchedLink = itemDict.get(bestMatch)
-print (GMT() + ' :: The link is for the item is: ')
-sleep(0.2)
-
-targetItemLink = 'https://www.supremenewyork.com' + bestMatchedLink
-print targetItemLink
-sleep(0.2)
-
-print GMT() + ' :: Loading browser'
-# driveTheWeb(targetItemLink)
+  ####
+# MAIN #
+  ####
+# pause.until(1479247440)
+# main()
