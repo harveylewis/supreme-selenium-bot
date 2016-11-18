@@ -22,8 +22,8 @@ def GMT():
 
 parser = SafeConfigParser()
 parser.read('Config.cfg')
-targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/shirts')
-keywords = ['Black', 'Plaid', 'Multi']
+targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/tops_sweaters')
+keywords = ['Floral', 'Waffle','Thermal','Black']
 
 
 #gets all HTML info from targetItemCategoryUrl
@@ -57,7 +57,6 @@ def followPageLinks(links):
 		nameOfProduct = (itemName[0].text)
 		colourOfProduct = (itemColour[0].text)
 		dictionary[nameOfProduct + ' ' + colourOfProduct] = url
-	list1 = [x.encode('ascii') for x in list1]
 	return dictionary, list1
 
 #creates a dictionary to search for best matched item
@@ -134,9 +133,9 @@ def driveTheWeb(link):
 
 def main():
 
-	print (GMT() + ' :: Opening Browser BOI')
-	driver = webdriver.Firefox()
-	driver.get(targetItemCategoryUrl)
+	# print (GMT() + ' :: Opening Browser BOI')
+	# driver = webdriver.Firefox()
+	# driver.get(targetItemCategoryUrl)
 
 	print GMT() + ' :: Your keywords are : ' + ', '.join(keywords)
 	allProductInfo = getLinks()
@@ -146,22 +145,23 @@ def main():
 	print GMT() + ' :: Extracted Links from the HTML'
 	linksList1 = extractLinks(allProductInfo)
 	sleep(0.2)
-
 	print GMT() + ' :: Starting to try for new links'
+
 	while True:
-		time.sleep(2) #Waits 2 seconds between requests
+		time.sleep(3.5) #Waits 2 seconds between requests
 		newHtml = getLinks()
 		linksList2 = extractLinks(newHtml)
 		print GMT() + ' :: Tried for new links'
 
 		if linksList1 != linksList2:
-			newLinks = linksList2 - linksList1
+			newLinks = getLinks()
+			newLinks = extractLinks(newLinks)
 			print GMT() + " :: New links found BOI"
 			break
 
 
 	# print (GMT() + ' :: Created a dictionary to lookup your target item')
-	itemDict, itemNameList = followPageLinks(linksList1)
+	itemDict, itemNameList = followPageLinks(newLinks)
 	sleep(0.2)
 
 	print (GMT() + ' :: Searching dictionary for best match')
@@ -187,5 +187,5 @@ def main():
   ####
 # MAIN #
   ####
-# pause.until(1479247440)
-# main()
+main()
+
