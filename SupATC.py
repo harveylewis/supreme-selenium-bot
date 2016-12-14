@@ -22,8 +22,8 @@ def GMT():
 
 parser = SafeConfigParser()
 parser.read('Config.cfg')
-targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/tops_sweaters')
-keywords = ['Floral', 'Waffle','Thermal','Black']
+targetItemCategoryUrl = ('http://www.supremenewyork.com/shop/all/shirts')
+keywords = ['Houndestooth','Flannel','Shirt',]
 
 
 #gets all HTML info from targetItemCategoryUrl
@@ -133,37 +133,35 @@ def driveTheWeb(link):
 
 def main():
 
-	# print (GMT() + ' :: Opening Browser BOI')
-	# driver = webdriver.Firefox()
-	# driver.get(targetItemCategoryUrl)
+	print (GMT() + ' :: Opening Browser BOI')
+	driver.get(targetItemCategoryUrl)
 
 	print GMT() + ' :: Your keywords are : ' + ', '.join(keywords)
 	allProductInfo = getLinks()
 	print (GMT() +  " :: saved HTML from target page")
-	sleep(0.2)
 
 	print GMT() + ' :: Extracted Links from the HTML'
 	linksList1 = extractLinks(allProductInfo)
-	sleep(0.2)
 	print GMT() + ' :: Starting to try for new links'
 
-	while True:
-		time.sleep(3.5) #Waits 2 seconds between requests
-		newHtml = getLinks()
-		linksList2 = extractLinks(newHtml)
-		print GMT() + ' :: Tried for new links'
+	# while True:
+	# 	time.sleep(3.5) #Waits 2 seconds between requests
+	# 	newHtml = getLinks()
+	# 	linksList2 = extractLinks(newHtml)
+	# 	print GMT() + ' :: Tried for new links'
 
-		if linksList1 != linksList2:
-			newLinks = getLinks()
-			newLinks = extractLinks(newLinks)
-			print GMT() + " :: New links found BOI"
-			break
+	# 	if linksList1 != linksList2:
+	# 		newLinks = getLinks()
+	# 		newLinks = extractLinks(newLinks)
+	# 		print GMT() + " :: New links found BOI"
+	# 		break
 
 
 	# print (GMT() + ' :: Created a dictionary to lookup your target item')
-	itemDict, itemNameList = followPageLinks(newLinks)
+	itemDict, itemNameList = followPageLinks(linksList1)
 	sleep(0.2)
 
+	print itemNameList
 	print (GMT() + ' :: Searching dictionary for best match')
 	bestMatch = findBestMatched(itemNameList)
 	sleep(0.2)
@@ -177,15 +175,16 @@ def main():
 	sleep(0.2)
 
 	targetItemLink = 'https://www.supremenewyork.com' + bestMatchedLink
-	print targetItemLink
-	sleep(0.2)
+	return targetItemLink
 
-	print GMT() + ' :: Loading browser'
-	driveTheWeb(targetItemLink)
+
 
 
   ####
 # MAIN #
   ####
-main()
+
+driver = webdriver.Firefox()
+link = main()
+driveTheWeb(link)
 
