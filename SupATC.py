@@ -90,22 +90,22 @@ def driveTheWeb(link):
 	fullNameEntry.send_keys('Harvey Lewis')
 
 	emailEntry = driver.find_element_by_id('order_email')
-	emailEntry.send_keys('harvey.l@hotmail.co.uk')
+	emailEntry.send_keys('')
 
 	telNumberEntry = driver.find_element_by_id('order_tel')
-	telNumberEntry.send_keys('07931248105')
+	telNumberEntry.send_keys('')
 
 	addressLineOneEntry = driver.find_element_by_id('bo')
-	addressLineOneEntry.send_keys('37A West town lane')
+	addressLineOneEntry.send_keys('')
 
 	addressLineTwoEntry = driver.find_element_by_id('oba3')
-	addressLineTwoEntry.send_keys('Brislington')
+	addressLineTwoEntry.send_keys('')
 
 	cityEntry = driver.find_element_by_id('order_billing_city')
-	cityEntry.send_keys('Bristol')
+	cityEntry.send_keys('')
 
 	postcodeEntry = driver.find_element_by_id('order_billing_zip')
-	postcodeEntry.send_keys('BS4 5DD')
+	postcodeEntry.send_keys('')
 
 	CCtypeDropDown = Select(driver.find_element_by_id('credit_card_type'))
 	CCtypeDropDown.select_by_visible_text('Visa')
